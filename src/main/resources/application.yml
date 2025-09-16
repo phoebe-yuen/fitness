@@ -1,0 +1,31 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/fitness
+    username: fitness
+    password: fitness
+
+---
+
+spring:
+  config:
+    activate:
+      on-rpofile: prod
+  datasource:
+    url: jdbc:postgresql://db:5432/fitness
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
+  jackson:
+    time-zone: UTC
+
+server:
+  port: 8080
+
+app:
+  jwt:
+    secret: "change-this-in-prod-please"
+    expiration-days: 7
