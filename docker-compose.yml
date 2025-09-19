@@ -2,6 +2,7 @@ version: '3.8'
 services:
   db:
     image: postgres:16-alpine
+    container_name: fitness-db
     environment:
       POSTGRES_DB: fitness
       POSTGRES_USER: fitness
@@ -10,9 +11,16 @@ services:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U fitness -d fitness"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
 
   pgadmin:
     image: dpage/pgadmin4:latest
+    container_name: fitness-pgadmin
     environment:
       PGADMIN_DEFAULT_EMAIL: admin@admin.com
       PGADMIN_DEFAULT_PASSWORD: admin
@@ -20,5 +28,26 @@ services:
       - "5050:80"
     depends_on:
       - db
-volumes:
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    restart: unless-stopped
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: fitness-app
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      APP_JWT_SECRET: ${APP_JWT_SECRET:-change-this-in-prod-please}
+      JAVA_TOOL_OPTIONS: "-XX:MaxRAMPercentage=75.0 -XX:+UseSerialGC"
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumns:
   pgdata: {}
+  pgadmin_data: {}

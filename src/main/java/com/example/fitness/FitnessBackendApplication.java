@@ -1,4 +1,4 @@
-package com.fitness.fitness_backend;
+package com.example.fitness;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
